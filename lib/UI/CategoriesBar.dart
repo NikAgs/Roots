@@ -12,10 +12,10 @@ class CategoriesBar extends StatelessWidget {
     return new Wrap(
       alignment: WrapAlignment.center,
       children: <Widget>[
-        new Category('ALL', _currCategory, () => _onUpdateCategory('ALL')),
-        new Category('BREWER', _currCategory, () => _onUpdateCategory('BREWER')),
-        new Category('AUDUBON', _currCategory, () => _onUpdateCategory('AUDUBON')),
-        new Category('FOSTERCITY', _currCategory, () => _onUpdateCategory('FOSTERCITY')),
+        new Category('all', _currCategory, () => _onUpdateCategory('all')),
+        new Category('brewer', _currCategory, () => _onUpdateCategory('brewer')),
+        new Category('audubon', _currCategory, () => _onUpdateCategory('audubon')),
+        new Category('fostercity', _currCategory, () => _onUpdateCategory('fostercity')),
       ],
     );
   }
