@@ -15,7 +15,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _currCategory = 'all';
 
-  void updateCategory(String update) {
+  void _updateCategory(String update) {
     setState(() => this._currCategory = update);
   }
 
@@ -35,18 +35,21 @@ class _MyHomePageState extends State<MyHomePage> {
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (!snapshot.hasData ||
-                snapshot.connectionState != ConnectionState.active)
-              return const Text('');
+                snapshot.connectionState == ConnectionState.waiting)
+              return const Text(''); // Blank Loading Page
+            List<Kid> kids =
+                snapshot.data.documents.map((DocumentSnapshot document) {
+              return new Kid(document.documentID, document['name'],
+                  document['school'], document['isCheckedIn']);
+            }).toList();
+            // DEBUG: print(kids.toString());
+            kids.sort((a, b) => a.name.compareTo(b.name));
             return new ListView(
                 padding: new EdgeInsets.only(top: 35.0),
                 children: <Widget>[
-                  new CategoriesBar(_currCategory, updateCategory),
+                  new CategoriesBar(_currCategory, _updateCategory),
                   new Padding(padding: new EdgeInsets.only(bottom: 20.0)),
-                  new KidGrid(
-                      snapshot.data.documents.map((DocumentSnapshot document) {
-                    return new Kid(document['name'], document['school'],
-                        document['isCheckedIn']);
-                  }).toList())
+                  new KidGrid(kids)
                 ]);
           },
         ));
