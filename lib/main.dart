@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'UI/CategoriesBar.dart';
 import 'UI/KidGrid.dart';
@@ -36,7 +34,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   .snapshots,
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (!snapshot.hasData) return const Text('Loading...');
+            if (!snapshot.hasData ||
+                snapshot.connectionState != ConnectionState.active)
+              return const Text('');
             return new ListView(
                 padding: new EdgeInsets.only(top: 35.0),
                 children: <Widget>[

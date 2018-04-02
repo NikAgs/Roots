@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
 class CategoriesBar extends StatelessWidget {
-
   final String _currCategory;
   final _onUpdateCategory;
 
-  CategoriesBar(this._currCategory,this._onUpdateCategory);
+  CategoriesBar(this._currCategory, this._onUpdateCategory);
 
   @override
   Widget build(BuildContext context) {
@@ -13,9 +12,12 @@ class CategoriesBar extends StatelessWidget {
       alignment: WrapAlignment.center,
       children: <Widget>[
         new Category('all', _currCategory, () => _onUpdateCategory('all')),
-        new Category('brewer', _currCategory, () => _onUpdateCategory('brewer')),
-        new Category('audubon', _currCategory, () => _onUpdateCategory('audubon')),
-        new Category('fostercity', _currCategory, () => _onUpdateCategory('fostercity')),
+        new Category(
+            'brewer', _currCategory, () => _onUpdateCategory('brewer')),
+        new Category(
+            'audubon', _currCategory, () => _onUpdateCategory('audubon')),
+        new Category(
+            'fostercity', _currCategory, () => _onUpdateCategory('fostercity')),
       ],
     );
   }
