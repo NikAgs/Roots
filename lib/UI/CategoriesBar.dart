@@ -32,7 +32,7 @@ class Category extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new FlatButton(
-      child: new Text(_name),
+      child: new Text(_name, style: new TextStyle(fontSize: 18.0)),
       color: _name == _currCategory ? Colors.blue : null,
       textColor: _name == _currCategory
           ? new Color(0xFFFFFFFF)
