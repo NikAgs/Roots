@@ -5,6 +5,7 @@ enum KidItem { markAbsent, viewProfile }
 
 PopupMenuButton<CheckinDayItem> checkinDayPopup(bool pickups) {
   return new PopupMenuButton<CheckinDayItem>(
+    icon: new Icon(Icons.more_vert),
     onSelected: (CheckinDayItem value) {},
     itemBuilder: (BuildContext context) => <PopupMenuItem<CheckinDayItem>>[
           new PopupMenuItem<CheckinDayItem>(
@@ -23,7 +24,7 @@ PopupMenuButton<CheckinDayItem> checkinDayPopup(bool pickups) {
 
 PopupMenuButton<KidItem> kidItem() {
   return new PopupMenuButton<KidItem>(
-    icon: new Icon(Icons.more_vert),
+    icon: new Icon(Icons.more_vert, color: Colors.black45, size: 20.0),
     onSelected: (KidItem value) {},
     itemBuilder: (BuildContext context) => <PopupMenuItem<KidItem>>[
           new PopupMenuItem<KidItem>(
