@@ -23,7 +23,7 @@ class KidCard extends StatelessWidget {
   final String _school;
   final String _grade;
   final List
-      _checkinStatus; //[0] -> at school, [1] -> at van, [2] -> at center, [3] absent?
+      _checkinStatus; // [0] -> at school, [1] -> at van, [2] -> at center, [3] absent?
 
   String get school => this._school;
   String get name => this._name;
@@ -34,14 +34,12 @@ class KidCard extends StatelessWidget {
   void _updateCheckinStatus(bool value, int checkinIndex) {
     List copy = _checkinStatus;
     copy[checkinIndex] = value;
-    Firestore.instance.collection('calendar').document(_date).updateData({
-      _id: {
-        'name': _name,
-        'school': _school,
-        'grade': _grade,
-        'checkinStatus': _checkinStatus
-      },
-    });
+    Firestore.instance
+        .collection('calendar')
+        .document(_date)
+        .getCollection('checkins')
+        .document(_id)
+        .updateData({'checkinStatus': copy});
   }
 
   Widget _buildLine(bool visible) {
@@ -69,12 +67,20 @@ class KidCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     new Container(
-                        padding: new EdgeInsets.only(
-                            left: 25.0, right: 25.0, top: 10.0),
-                        child: new Text("$_name",
-                            style: new TextStyle(
-                                fontSize: 18.0, color: Colors.black87))),
-                    kidItem()
+                        padding: new EdgeInsets.only(left: 25.0, top: 10.0),
+                        child: new Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              new Text("$_name",
+                                  style: new TextStyle(
+                                      fontSize: 18.0, color: Colors.black87)),
+                              new Padding(
+                                  padding: new EdgeInsets.only(left: 15.0)),
+                              new Text("$_grade",
+                                  style: new TextStyle(
+                                      fontSize: 15.0, color: Colors.black54))
+                            ])),
+                    kidItem(_checkinStatus[3], _updateCheckinStatus)
                   ]),
               new Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
