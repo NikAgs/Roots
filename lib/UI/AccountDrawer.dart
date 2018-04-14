@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import '../Pages/CalendarPage.dart';
+import '../Pages/LoginPage.dart';
 
 class AccountDrawer extends StatelessWidget {
   @override
@@ -21,8 +25,7 @@ class AccountDrawer extends StatelessWidget {
                                 new AssetImage('images/Schuchi.png'),
                             radius: 50.0),
                         new Padding(
-                            padding:
-                                new EdgeInsets.only(top: 1.5, bottom: 1.5)),
+                            padding: new EdgeInsets.symmetric(vertical: 1.5)),
                         new Text('Schuchi Agrawal',
                             style: new TextStyle(color: Colors.white)),
                       ],
@@ -32,7 +35,10 @@ class AccountDrawer extends StatelessWidget {
             leading: const Icon(Icons.date_range),
             title: new Text('Calendar'),
             onTap: () {
-              // TODO
+              Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                      builder: (context) => new CalendarView()));
             },
           ),
           new ListTile(
@@ -40,6 +46,7 @@ class AccountDrawer extends StatelessWidget {
             title: new Text('Edit Child Info'),
             onTap: () {
               // TODO
+              print('you tapped on edit child info');
             },
           ),
           new ListTile(
@@ -47,13 +54,16 @@ class AccountDrawer extends StatelessWidget {
             title: new Text('Settings'),
             onTap: () {
               // TODO
+              print('you tapped on settings');
             },
           ),
           new ListTile(
             leading: const Icon(Icons.exit_to_app),
             title: new Text('Logout'),
             onTap: () {
-              // TODO
+              FirebaseAuth.instance.signOut();
+              Navigator.push(context,
+                  new MaterialPageRoute(builder: (context) => new LoginPage()));
             },
           )
         ],

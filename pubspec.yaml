@@ -5,6 +5,9 @@ dependencies:
   cloud_firestore: "^0.3.2"
   flutter_search_bar: "^2.0.3"
   intl: "^0.15.4"
+  flutter_calendar: "^0.0.1"
+  material_search: "^0.2.1"
+  firebase_auth: "^0.5.4"
   
   flutter:
     sdk: flutter
@@ -36,6 +39,7 @@ flutter:
 
   assets:
     - images/Schuchi.png
+    - images/rfk-logo.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
 
