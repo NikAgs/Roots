@@ -9,8 +9,12 @@ import '../UI/DatePicker.dart';
 import 'dart:async';
 
 class CalendarView extends StatefulWidget {
+  final Map _permissions;
+
+  CalendarView(this._permissions);
+
   @override
-  _CalendarViewState createState() => new _CalendarViewState();
+  _CalendarViewState createState() => new _CalendarViewState(_permissions);
 }
 
 class _CalendarViewState extends State<CalendarView> {
@@ -23,6 +27,10 @@ class _CalendarViewState extends State<CalendarView> {
   String _absentKid;
   List<String> _kidNames = ['', '']; // loading default
   StreamSubscription<QuerySnapshot> _listener;
+
+  Map _permissions;
+
+  _CalendarViewState(this._permissions);
 
   @override
   void initState() {
@@ -65,10 +73,12 @@ class _CalendarViewState extends State<CalendarView> {
             new Calendar(
               onDateSelected: (DateTime dt) async {
                 await initializeToday(dt);
-                Navigator.push(
+                Navigator.pushAndRemoveUntil(
                     context,
                     new MaterialPageRoute(
-                        builder: (context) => new CheckinPage(dt)));
+                        builder: (context) =>
+                            new CheckinPage(dt, _permissions)),
+                    (Route r) => !Navigator.canPop(context));
               },
             ),
             new Padding(padding: new EdgeInsets.only(top: 60.0)),

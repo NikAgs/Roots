@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 
 import 'dart:async';
 
+import 'Getters.dart';
+
 /*
 * If the checkinData does not exist for a given day, create it and put it in the database
 * Else, modify today's or any future day's checkinData according to the current 'kids' collection
@@ -25,21 +27,8 @@ Future<void> initializeToday(DateTime dt) async {
   });
 }
 
-Future<List<DocumentSnapshot>> getKids() async {
-  return (await Firestore.instance.collection('kids').getDocuments()).documents;
-}
-
-Future<DocumentSnapshot> getKidDay(String id, String date) async {
-  return Firestore.instance
-      .collection('calendar')
-      .document(date)
-      .getCollection('checkins')
-      .document(id)
-      .get();
-}
-
 Future<void> initializeCheckinStatus(
-    String date, DocumentSnapshot kid, List checkinStatus) async {
+  String date, DocumentSnapshot kid, List checkinStatus) async {
   Firestore.instance
       .collection('calendar')
       .document(date)

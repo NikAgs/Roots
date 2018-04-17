@@ -5,6 +5,10 @@ import '../Pages/CalendarPage.dart';
 import '../Pages/LoginPage.dart';
 
 class AccountDrawer extends StatelessWidget {
+  final Map _permissions;
+
+  AccountDrawer(this._permissions);
+
   @override
   Widget build(BuildContext context) {
     return new Drawer(
@@ -31,24 +35,30 @@ class AccountDrawer extends StatelessWidget {
                       ],
                     )
                   ])),
-          new ListTile(
-            leading: const Icon(Icons.date_range),
-            title: new Text('Calendar'),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  new MaterialPageRoute(
-                      builder: (context) => new CalendarView()));
-            },
-          ),
-          new ListTile(
-            leading: const Icon(Icons.mode_edit),
-            title: new Text('Edit Child Info'),
-            onTap: () {
-              // TODO
-              print('you tapped on edit child info');
-            },
-          ),
+          _permissions['calendarAccess']
+              ? new ListTile(
+                  leading: const Icon(Icons.date_range),
+                  title: new Text('Calendar'),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                            builder: (context) =>
+                                new CalendarView(_permissions)));
+                  },
+                )
+              : null,
+          _permissions['canEditKids']
+              ? new ListTile(
+                  leading: const Icon(Icons.mode_edit),
+                  title: new Text('Edit Child Info'),
+                  onTap: () {
+                    // TODO
+                    print('you tapped on edit child info');
+                  },
+                )
+              : null,
+          /*
           new ListTile(
             leading: const Icon(Icons.settings),
             title: new Text('Settings'),
@@ -57,6 +67,7 @@ class AccountDrawer extends StatelessWidget {
               print('you tapped on settings');
             },
           ),
+          */
           new ListTile(
             leading: const Icon(Icons.exit_to_app),
             title: new Text('Logout'),
@@ -66,7 +77,7 @@ class AccountDrawer extends StatelessWidget {
                   new MaterialPageRoute(builder: (context) => new LoginPage()));
             },
           )
-        ],
+        ].where((Object o) => o != null).toList(),
       ),
     );
   }

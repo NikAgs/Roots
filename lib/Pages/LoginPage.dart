@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'CheckinPage.dart';
-
-final FirebaseAuth _auth = FirebaseAuth.instance;
+import '../Database/Getters.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -52,13 +51,17 @@ class _LoginPageState extends State<LoginPage> {
           height: 42.0,
           onPressed: () async {
             try {
-              await _auth.signInWithEmailAndPassword(
+              await FirebaseAuth.instance.signInWithEmailAndPassword(
                   email: (_username.text + '@rootsforkids.org'),
                   password: _password.text);
+
+              Map permissions = await getPermissions();
+
               Navigator.push(
                   context,
                   new MaterialPageRoute(
-                      builder: (context) => new CheckinPage(DateTime.now())));
+                      builder: (context) =>
+                          new CheckinPage(DateTime.now(), permissions)));
             } catch (e) {
               setState(() => _invalidUserPass = true);
               _password.text = '';

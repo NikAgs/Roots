@@ -14,21 +14,31 @@ import '../UI/Menus.dart';
 
 class CheckinPage extends StatefulWidget {
   final DateTime _dt;
+  final Map _permissions;
 
-  CheckinPage(this._dt);
+  CheckinPage(this._dt, this._permissions);
 
   @override
-  _CheckinPageState createState() => new _CheckinPageState(_dt);
+  _CheckinPageState createState() => new _CheckinPageState(_dt, _permissions);
 }
 
 class _CheckinPageState extends State<CheckinPage> {
   final DateTime _dt;
 
+  Map _permissions; // {calendarAccess -> T/F, canEditKids -> T/F, canEditToday -> T/F}
+  bool _canEditToday;
   bool _pickups = true;
   String _currCategory = 'all';
   StreamSubscription<QuerySnapshot> _listener;
 
-  _CheckinPageState(this._dt);
+  _CheckinPageState(this._dt, this._permissions) {
+    if (new DateFormat.yMMMMd('en_US').format(DateTime.now()) ==
+        new DateFormat.yMMMMd('en_US').format(_dt)) {
+      _canEditToday = _permissions['canEditToday'];
+    } else {
+      _canEditToday = _permissions['calendarAccess'];
+    }
+  }
 
   @override
   void initState() {
@@ -61,28 +71,34 @@ class _CheckinPageState extends State<CheckinPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        drawer: new AccountDrawer(),
+        drawer: new AccountDrawer(_permissions),
         appBar: new AppBar(
             backgroundColor: _pickups ? null : Colors.red,
             centerTitle: true,
             title: new Text(new DateFormat.MMMMEEEEd('en_US').format(_dt)),
             actions: <Widget>[
+              /*
               new IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () => print('you pressed the search button'),
                   tooltip: 'Search'),
-              checkinDayPopup(_pickups, _callPickupsCallback),
-            ]),
+              */
+              _canEditToday
+                  ? checkinDayPopup(_pickups, _callPickupsCallback)
+                  : null,
+            ].where((Object o) => o != null).toList()),
         body: new RefreshIndicator(
             onRefresh: _callRefreshCallback,
             child: new ListView(
                 padding: new EdgeInsets.only(top: 35.0),
                 children: _pickups
                     ? <Widget>[
-                        new CategoriesBar(_currCategory, _updateCategory),
+                        _canEditToday
+                            ? new CategoriesBar(_currCategory, _updateCategory)
+                            : null,
                         new Padding(padding: new EdgeInsets.only(bottom: 20.0)),
                         _buildKidCardGrid()
-                      ]
+                      ].where((Object o) => o != null).toList()
                     : <Widget>[
                         new Padding(padding: new EdgeInsets.only(top: 25.0)),
                         new Center(

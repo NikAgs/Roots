@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "778525807442",
+    "firebase_url": "https://rootsforkids-35dfb.firebaseio.com",
+    "project_id": "rootsforkids-35dfb",
+    "storage_bucket": "rootsforkids-35dfb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:778525807442:android:9a4a7771cb810e8c",
+        "android_client_info": {
+          "package_name": "com.example.testproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "778525807442-e0mv0aj5hsjh45o2s6mn1mqrq9dbh4j5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAYs4KFBb2sECMv7odB_3zsUFaHMNFu7c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

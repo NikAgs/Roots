@@ -2,12 +2,12 @@ name: test_project
 description: A new Flutter project.
 
 dependencies:
-  cloud_firestore: "^0.3.2"
-  flutter_search_bar: "^2.0.3"
+  cloud_firestore: "^0.6.2"
   intl: "^0.15.4"
   flutter_calendar: "^0.0.1"
   material_search: "^0.2.1"
   firebase_auth: "^0.5.4"
+  google_sign_in: "^3.0.1"
   
   flutter:
     sdk: flutter
