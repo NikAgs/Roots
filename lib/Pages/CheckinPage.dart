@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 
 import 'dart:async';
 
 import '../Database/Initializers.dart';
+import '../Database/Getters.dart';
 
 import '../UI/CategoriesBar.dart';
-import '../UI/KidCardGrid.dart';
+import '../UI/KidCard.dart';
 import '../UI/AccountDrawer.dart';
 import '../UI/Menus.dart';
 
@@ -28,8 +28,13 @@ class _CheckinPageState extends State<CheckinPage> {
   Map _permissions; // {calendarAccess -> T/F, canEditKids -> T/F, canEditToday -> T/F}
   bool _canEditToday;
   bool _pickups = true;
-  String _currCategory = 'all';
-  StreamSubscription<QuerySnapshot> _listener;
+  List<String> _categories = [
+    'all',
+    'all'
+  ]; // [0] -> school, [1] -> Kinder/Elementary
+  StreamSubscription<QuerySnapshot> _exceptionListener;
+  List<KidCard> _kids = [];
+  List<KidCard> _filteredKids = [];
 
   _CheckinPageState(this._dt, this._permissions) {
     if (new DateFormat.yMMMMd('en_US').format(DateTime.now()) ==
@@ -43,11 +48,21 @@ class _CheckinPageState extends State<CheckinPage> {
   @override
   void initState() {
     super.initState();
-    initializeToday(_dt);
-    _listener = Firestore.instance
+
+    initializeToday(_dt).then((void v) {
+      getKidCards(_dt).then((List<KidCard> gotKids) {
+        setState(() {
+          _kids = gotKids;
+          _kids.sort((a,b) => a.name.compareTo(b.name));
+          _filteredKids = _kids;
+        });
+      });
+    });
+
+    _exceptionListener = Firestore.instance
         .collection('calendar')
         .document('exceptions')
-        .getCollection('noPickupDays')
+        .collection('noPickupDays')
         .snapshots
         .listen((QuerySnapshot doc) {
       if (doc != null) {
@@ -65,7 +80,7 @@ class _CheckinPageState extends State<CheckinPage> {
   @override
   void dispose() {
     super.dispose();
-    _listener.cancel();
+    _exceptionListener.cancel();
   }
 
   @override
@@ -93,11 +108,16 @@ class _CheckinPageState extends State<CheckinPage> {
                 padding: new EdgeInsets.only(top: 35.0),
                 children: _pickups
                     ? <Widget>[
+                        new Padding(padding: new EdgeInsets.only(bottom: 10.0)),
                         _canEditToday
-                            ? new CategoriesBar(_currCategory, _updateCategory)
+                            ? new CategoriesBar(_categories, _updateCategory)
                             : null,
-                        new Padding(padding: new EdgeInsets.only(bottom: 20.0)),
-                        _buildKidCardGrid()
+                        new Padding(padding: new EdgeInsets.only(bottom: 25.0)),
+                        new Wrap(
+                            alignment: WrapAlignment.center,
+                            direction: Axis.horizontal,
+                            children: _filteredKids),
+                        new Padding(padding: new EdgeInsets.only(bottom: 30.0))
                       ].where((Object o) => o != null).toList()
                     : <Widget>[
                         new Padding(padding: new EdgeInsets.only(top: 25.0)),
@@ -108,53 +128,52 @@ class _CheckinPageState extends State<CheckinPage> {
                       ])));
   }
 
-  void _updateCategory(String update) {
-    setState(() => this._currCategory = update);
+  void _updateCategory(String update, int categoryIndex) {
+    setState(() {
+      _categories[categoryIndex] = update;
+      _filteredKids = filterKids(_kids);
+    });
+  }
+
+  List<KidCard> filterKids(List<KidCard> kids) {
+    List<KidCard> filtered = kids.where((KidCard kc) {
+      if (_categories[0] == 'all' || kc.school == _categories[0]) {
+        if (_categories[1] == 'all' || groupGrade(kc.grade) == _categories[1]) {
+          return true;
+        }
+      }
+      return false;
+    }).toList();
+    filtered.sort((a, b) => a.name.compareTo(b.name));
+    return filtered;
+  }
+
+  String groupGrade(String grade) {
+    if (grade == '') return 'elementary';
+    try {
+      int.parse(grade);
+      return 'elementary';
+    } catch (FormatException) {
+      return 'kinder';
+    }
   }
 
   Future<Null> _callRefreshCallback() async {
-    initializeToday(_dt);
+    Navigator.pushReplacement(
+        context,
+        new MaterialPageRoute(
+            builder: (context) => new CheckinPage(_dt, _permissions)));
   }
 
   void _callPickupsCallback(bool pickups) {
     DocumentReference ref = Firestore.instance
         .collection('calendar')
         .document('exceptions')
-        .getCollection('noPickupDays')
+        .collection('noPickupDays')
         .document(new DateFormat.yMMMMd('en_US').format(_dt));
     if (pickups)
       ref.delete();
     else
       ref.setData({});
-  }
-
-  Widget _buildKidCardGrid() {
-    String date = new DateFormat.yMMMMd('en_US').format(_dt);
-    return new StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance
-          .collection('calendar')
-          .document(date)
-          .getCollection('checkins')
-          .snapshots,
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData ||
-            snapshot.connectionState == ConnectionState.waiting)
-          return const Text(''); // Blank Loading Page
-        List<KidCard> kids = new List();
-        snapshot.data.documents.forEach((DocumentSnapshot kid) {
-          if (_currCategory == 'all' || kid.data['school'] == _currCategory) {
-            kids.add(new KidCard(
-                kid.documentID,
-                date,
-                kid.data['name'],
-                kid.data['school'],
-                kid.data['grade'],
-                kid.data['checkinStatus']));
-          }
-        });
-        kids.sort((a, b) => a.name.compareTo(b.name));
-        return new KidCardGrid(kids);
-      },
-    );
   }
 }
