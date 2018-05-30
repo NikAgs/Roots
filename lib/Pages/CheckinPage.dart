@@ -53,7 +53,7 @@ class _CheckinPageState extends State<CheckinPage> {
       getKidCards(_dt).then((List<KidCard> gotKids) {
         setState(() {
           _kids = gotKids;
-          _kids.sort((a,b) => a.name.compareTo(b.name));
+          _kids.sort((a, b) => a.name.compareTo(b.name));
           _filteredKids = _kids;
         });
       });
@@ -144,7 +144,9 @@ class _CheckinPageState extends State<CheckinPage> {
       }
       return false;
     }).toList();
-    filtered.sort((a, b) => a.name.compareTo(b.name));
+    filtered.sort((a, b) {
+      return a.name.compareTo(b.name);
+    });
     return filtered;
   }
 

@@ -97,9 +97,9 @@ class _KidCardState extends State<KidCard> {
 
   void _updateCheckinStatus(bool value, int checkinIndex) {
     List copy = _checkinStatus;
-    if (_noPickup || _dropoff) return;
-    if (checkinIndex == 1 && copy[0] == false) return;
-    if (checkinIndex == 2 && (copy[1] == false || copy[0] == false)) return;
+    // if (_noPickup || _dropoff) return;
+    // if (checkinIndex == 1 && copy[0] == false) return;
+    // if (checkinIndex == 2 && (copy[1] == false || copy[0] == false)) return;
 
     copy[checkinIndex] = value;
     Firestore.instance
@@ -132,8 +132,34 @@ class _KidCardState extends State<KidCard> {
 
   Color _colorChooser() {
     if (_noPickup) return new Color(0xFFFFB3B3);
-    if (_dropoff) return Colors.blueAccent;
+    if (_dropoff) return new Color(0xFFb3d9ff);
+    if (_checkinStatus[2]) return new Color(0xFF5DEFA8);
+    if (_checkinStatus[1]) return new Color(0xFFA2F6CD);
+    if (_checkinStatus[0]) return new Color(0xFFD0FBE6);
     return null;
+  }
+
+  Widget _buildIconRow() {
+    if (_dropoff) {
+      return new Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new IconCheckBox(_checkinStatus[2], 2, _updateCheckinStatus)
+          ]);
+    }
+
+    if (_noPickup) {
+      return new SizedBox(height: 48.0);
+    }
+    return new Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          new IconCheckBox(_checkinStatus[0], 0, _updateCheckinStatus),
+          _buildLine(_checkinStatus[0] && _checkinStatus[1]),
+          new IconCheckBox(_checkinStatus[1], 1, _updateCheckinStatus),
+          _buildLine(_checkinStatus[1] && _checkinStatus[2]),
+          new IconCheckBox(_checkinStatus[2], 2, _updateCheckinStatus),
+        ]);
   }
 
   @override
@@ -158,7 +184,7 @@ class _KidCardState extends State<KidCard> {
                               child: new Text("$_name",
                                   overflow: TextOverflow.ellipsis,
                                   style: new TextStyle(
-                                      fontSize: 24.0,
+                                      fontSize: 23.0,
                                       color: new Color(0xFF595959))),
                             ),
                             new Padding(
@@ -169,18 +195,7 @@ class _KidCardState extends State<KidCard> {
                                         color: Colors.black54))),
                             kidItem(_noPickup, _dropoff, _updateException)
                           ])),
-                  new Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        new IconCheckBox(
-                            _checkinStatus[0], 0, _updateCheckinStatus),
-                        _buildLine(_checkinStatus[0] && _checkinStatus[1]),
-                        new IconCheckBox(
-                            _checkinStatus[1], 1, _updateCheckinStatus),
-                        _buildLine(_checkinStatus[1] && _checkinStatus[2]),
-                        new IconCheckBox(
-                            _checkinStatus[2], 2, _updateCheckinStatus),
-                      ])
+                  _buildIconRow()
                 ])));
   }
 }
@@ -196,16 +211,16 @@ class IconCheckBox extends StatelessWidget {
     switch (index) {
       case 0:
         return _isChecked
-            ? new Icon(Icons.location_city, color: Colors.blue[300])
-            : new Icon(Icons.location_city, color: Colors.black45);
+            ? new Icon(Icons.location_city, color: new Color(0xFF0086b3))
+            : new Icon(Icons.location_city, color: new Color(0xFF737373));
       case 1:
         return _isChecked
-            ? new Icon(Icons.airport_shuttle, color: Colors.blue[300])
-            : new Icon(Icons.airport_shuttle, color: Colors.black45);
+            ? new Icon(Icons.airport_shuttle, color: new Color(0xFF0086b3))
+            : new Icon(Icons.airport_shuttle, color: new Color(0xFF737373));
       case 2:
         return _isChecked
-            ? new Icon(Icons.store, color: Colors.blue[300])
-            : new Icon(Icons.store, color: Colors.black45);
+            ? new Icon(Icons.store, color: new Color(0xFF0086b3))
+            : new Icon(Icons.store, color: new Color(0xFF737373));
     }
     print("Invalid index");
     return null;

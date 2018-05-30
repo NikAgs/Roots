@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'CheckinPage.dart';
 import '../Database/Initializers.dart';
 import '../UI/DatePicker.dart';
+import '../Database/Exceptions.dart';
 
 import 'dart:async';
 
@@ -25,8 +26,8 @@ class _CalendarViewState extends State<CalendarView> {
   DateTime _absentToDate = new DateTime.now();
 
   String _absentKid;
-  List<String> _kidNames = ['', '']; // loading default
   StreamSubscription<QuerySnapshot> _listener;
+  Map<String, String> _kidMap = {}; // loading default
 
   Map _permissions;
 
@@ -41,10 +42,10 @@ class _CalendarViewState extends State<CalendarView> {
         .listen((QuerySnapshot doc) {
       if (doc != null) {
         setState(() {
-          _kidNames = doc.documents.map<String>((DocumentSnapshot doc) {
-            return doc.data['name'];
-          }).toList();
-          _kidNames.sort();
+          List<DocumentSnapshot> list = doc.documents;
+          list.sort((a, b) => a.data['name'].compareTo(b.data['name']));
+          _kidMap = new Map.fromIterable(list,
+              key: (doc) => doc.data['name'], value: (doc) => doc.documentID);
         });
       }
     });
@@ -98,17 +99,31 @@ class _CalendarViewState extends State<CalendarView> {
         child: const Text('Cancel pickups from',
             style: const TextStyle(fontSize: 20.0)),
       ),
-      datePicker(_noPickupsFromDate),
+      new DateTimePicker(
+        selectedDate: _noPickupsFromDate,
+        selectDate: (DateTime date) {
+          setState(() {
+            _noPickupsFromDate = date;
+          });
+        },
+      ),
       new Padding(
         padding: new EdgeInsets.all(20.0),
         child: const Text('to', style: const TextStyle(fontSize: 20.0)),
       ),
-      datePicker(_noPickupsToDate),
+      new DateTimePicker(
+        selectedDate: _noPickupsToDate,
+        selectDate: (DateTime date) {
+          setState(() {
+            _noPickupsToDate = date;
+          });
+        },
+      ),
       new Padding(
         padding: new EdgeInsets.only(top: 10.0, left: 30.0),
         child: new RaisedButton(
             onPressed: () {
-              // TODO
+              setNoPickups(_noPickupsFromDate, _noPickupsToDate);
             },
             child: const Text('Cancel')),
       )
@@ -125,10 +140,10 @@ class _CalendarViewState extends State<CalendarView> {
         padding: new EdgeInsets.only(top: 5.0),
         child: new DropdownButton<String>(
             value: _absentKid,
-            items: _kidNames.map((String value) {
+            items: _kidMap.keys.map((String value) {
               return new DropdownMenuItem<String>(
                 value: value,
-                child: new Text(value),
+                child: new Text(value, style: const TextStyle(fontSize: 22.0)),
               );
             }).toList(),
             onChanged: (String name) {
@@ -142,17 +157,32 @@ class _CalendarViewState extends State<CalendarView> {
         child: const Text('as absent from ',
             style: const TextStyle(fontSize: 20.0)),
       ),
-      datePicker(_absentFromDate),
+      new DateTimePicker(
+        selectedDate: _absentFromDate,
+        selectDate: (DateTime date) {
+          setState(() {
+            _absentFromDate = date;
+          });
+        },
+      ),
       new Padding(
         padding: new EdgeInsets.all(20.0),
         child: const Text('to', style: const TextStyle(fontSize: 20.0)),
       ),
-      datePicker(_absentToDate),
+      new DateTimePicker(
+        selectedDate: _absentToDate,
+        selectDate: (DateTime date) {
+          setState(() {
+            _absentToDate = date;
+          });
+        },
+      ),
       new Padding(
         padding: new EdgeInsets.only(top: 10.0, left: 30.0),
         child: new RaisedButton(
             onPressed: () {
-              // TODO
+              setAbsentDays(
+                  _kidMap[_absentKid], _absentFromDate, _absentToDate);
             },
             child: const Text('Mark')),
       )

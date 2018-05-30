@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../Pages/CalendarPage.dart';
 import '../Pages/LoginPage.dart';
+import '../Pages/EditKids.dart';
 
 class AccountDrawer extends StatelessWidget {
   final Map _permissions;
@@ -53,8 +54,11 @@ class AccountDrawer extends StatelessWidget {
                   leading: const Icon(Icons.mode_edit),
                   title: new Text('Edit Child Info'),
                   onTap: () {
-                    // TODO
-                    print('you tapped on edit child info');
+                    Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                            builder: (context) =>
+                                new ExpansionPanelsDemo()));
                   },
                 )
               : null,
