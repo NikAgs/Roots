@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'dart:async';
 
 import 'Getters.dart';
+import 'Exceptions.dart';
 
 /*
 * If the checkinData does not exist for a given day, create it and put it in the database

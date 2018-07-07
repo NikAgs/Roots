@@ -282,12 +282,7 @@ class _ExpansionPanelsDemoState extends State<ExpansionPanelsDemo> {
       appBar: new AppBar(
           title: const Text('Edit Kids Information'),
           centerTitle: true,
-          actions: <Widget>[
-            new IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () => print('wanna add a kid?'),
-                tooltip: 'Add Kid'),
-          ]),
+      ),
       body: new SingleChildScrollView(
         child: new SafeArea(
           top: false,

@@ -11,11 +11,13 @@ import 'dart:async';
 
 class CalendarView extends StatefulWidget {
   final Map _permissions;
+  final String _user;
+  final List<String> _schools;
 
-  CalendarView(this._permissions);
+  CalendarView(this._permissions, this._user, this._schools);
 
   @override
-  _CalendarViewState createState() => new _CalendarViewState(_permissions);
+  _CalendarViewState createState() => new _CalendarViewState(_permissions, _user, _schools);
 }
 
 class _CalendarViewState extends State<CalendarView> {
@@ -30,8 +32,10 @@ class _CalendarViewState extends State<CalendarView> {
   Map<String, String> _kidMap = {}; // loading default
 
   Map _permissions;
+  String _user;
+  List<String> _schools;
 
-  _CalendarViewState(this._permissions);
+  _CalendarViewState(this._permissions, this._user, this._schools);
 
   @override
   void initState() {
@@ -79,7 +83,7 @@ class _CalendarViewState extends State<CalendarView> {
                     context,
                     new MaterialPageRoute(
                         builder: (context) =>
-                            new CheckinPage(dt, _permissions)),
+                            new CheckinPage(dt, _permissions, _user, _schools)),
                     (Route r) => !Navigator.canPop(context));
               },
             ),

@@ -77,8 +77,8 @@ PopupMenuButton<KidItem> kidItem(
             new PopupMenuItem<KidItem>(
               value: KidItem.viewProfile,
               child: const ListTile(
-                  leading: const Icon(Icons.account_circle),
-                  title: const Text('View Profile')),
+                  leading: const Icon(Icons.email),
+                  title: const Text('Send Email')),
             )
           ].where((Object o) => o != null).toList());
 }

@@ -4,10 +4,9 @@ import 'package:intl/intl.dart';
 
 Future<void> setNoPickups(DateTime from, DateTime to) async {
   if (from.isAfter(to)) return null;
-
   DateTime temp = from;
 
-  while (temp.isBefore(to)) {
+  while (temp.isBefore(to) || temp.isAtSameMomentAs(to)) {
     Firestore.instance
         .collection('calendar')
         .document('exceptions')

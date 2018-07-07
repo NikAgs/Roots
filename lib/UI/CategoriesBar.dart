@@ -1,31 +1,51 @@
 import 'package:flutter/material.dart';
 
-class CategoriesBar extends StatelessWidget {
+class CategoriesBar extends StatefulWidget {
   final List<String> _categories;
   final _onUpdateCategory;
+  final List<String> _schools;
 
-  CategoriesBar(this._categories, this._onUpdateCategory);
+  CategoriesBar(this._categories, this._onUpdateCategory, this._schools);
+
+  @override
+  _CategoriesBarState createState() =>
+      new _CategoriesBarState(_categories, _onUpdateCategory, _schools);
+}
+
+class _CategoriesBarState extends State<CategoriesBar> {
+  List<String> _categories;
+  var _onUpdateCategory;
+  List<String> _schools;
+  String value = 'all';
+
+  _CategoriesBarState(this._categories, this._onUpdateCategory, this._schools);
 
   @override
   Widget build(BuildContext context) {
     return new Wrap(
       alignment: WrapAlignment.center,
       children: <Widget>[
-        new Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            new Padding(padding: new EdgeInsets.only(left: 15.0)),
-            new Category(
-                'all', _categories[0], () => _onUpdateCategory('all', 0), 0),
-            new Category('brewer', _categories[0],
-                () => _onUpdateCategory('brewer', 0), 0),
-            new Category('audubon', _categories[0],
-                () => _onUpdateCategory('audubon', 0), 0),
-            new Category('fostercity', _categories[0],
-                () => _onUpdateCategory('fostercity', 0), 0),
-            new Padding(padding: new EdgeInsets.only(right: 20.0)),
-          ],
+        new DropdownButton<String>(
+          value: value,
+          style: new TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.w500,
+              color: new Color(0xFF636363)),
+          onChanged: (String newValue) {
+            setState(() {
+              value = newValue;
+              _onUpdateCategory(newValue, 0);
+            });
+          },
+          items: _schools.map((String school) {
+            return new DropdownMenuItem<String>(
+                value: school,
+                child: new Container(
+                    child: new Text(school, textAlign: TextAlign.center),
+                    width: 150.0));
+          }).toList(),
         ),
+        new SizedBox(width: 15.0, height: 50.0),
         new Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[

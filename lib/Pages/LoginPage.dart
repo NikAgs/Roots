@@ -56,15 +56,17 @@ class _LoginPageState extends State<LoginPage> {
                   password: _password.text);
 
               Map permissions = await getPermissions();
+              List<String> schools = await getSchoolNames();
 
               Navigator.push(
                   context,
                   new MaterialPageRoute(
-                      builder: (context) =>
-                          new CheckinPage(DateTime.now(), permissions)));
+                      builder: (context) => new CheckinPage(DateTime.now(),
+                          permissions, _username.text, schools)));
             } catch (e) {
               setState(() => _invalidUserPass = true);
               _password.text = '';
+              print(e);
             }
           },
           color: new Color(0xFF3F69F1),

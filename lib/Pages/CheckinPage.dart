@@ -15,17 +15,22 @@ import '../UI/Menus.dart';
 class CheckinPage extends StatefulWidget {
   final DateTime _dt;
   final Map _permissions;
+  final String _user;
+  final List<String> _schools;
 
-  CheckinPage(this._dt, this._permissions);
+  CheckinPage(this._dt, this._permissions, this._user, this._schools);
 
   @override
-  _CheckinPageState createState() => new _CheckinPageState(_dt, _permissions);
+  _CheckinPageState createState() => new _CheckinPageState(_dt, _permissions, _user, _schools);
 }
 
 class _CheckinPageState extends State<CheckinPage> {
   final DateTime _dt;
 
   Map _permissions; // {calendarAccess -> T/F, canEditKids -> T/F, canEditToday -> T/F}
+  String _user;
+  List<String> _schools;
+
   bool _canEditToday;
   bool _pickups = true;
   List<String> _categories = [
@@ -36,7 +41,7 @@ class _CheckinPageState extends State<CheckinPage> {
   List<KidCard> _kids = [];
   List<KidCard> _filteredKids = [];
 
-  _CheckinPageState(this._dt, this._permissions) {
+  _CheckinPageState(this._dt, this._permissions, this._user, this._schools) {
     if (new DateFormat.yMMMMd('en_US').format(DateTime.now()) ==
         new DateFormat.yMMMMd('en_US').format(_dt)) {
       _canEditToday = _permissions['canEditToday'];
@@ -86,7 +91,7 @@ class _CheckinPageState extends State<CheckinPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        drawer: new AccountDrawer(_permissions),
+        drawer: new AccountDrawer(_permissions, _user, _schools),
         appBar: new AppBar(
             backgroundColor: _pickups ? null : Colors.red,
             centerTitle: true,
@@ -110,7 +115,7 @@ class _CheckinPageState extends State<CheckinPage> {
                     ? <Widget>[
                         new Padding(padding: new EdgeInsets.only(bottom: 10.0)),
                         _canEditToday
-                            ? new CategoriesBar(_categories, _updateCategory)
+                            ? new CategoriesBar(_categories, _updateCategory, _schools)
                             : null,
                         new Padding(padding: new EdgeInsets.only(bottom: 25.0)),
                         new Wrap(
@@ -164,7 +169,7 @@ class _CheckinPageState extends State<CheckinPage> {
     Navigator.pushReplacement(
         context,
         new MaterialPageRoute(
-            builder: (context) => new CheckinPage(_dt, _permissions)));
+            builder: (context) => new CheckinPage(_dt, _permissions, _user, _schools)));
   }
 
   void _callPickupsCallback(bool pickups) {

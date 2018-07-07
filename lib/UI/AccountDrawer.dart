@@ -7,8 +7,25 @@ import '../Pages/EditKids.dart';
 
 class AccountDrawer extends StatelessWidget {
   final Map _permissions;
+  final String _user;
+  final List<String> _schools;
 
-  AccountDrawer(this._permissions);
+  AccountDrawer(this._permissions, this._user, this._schools);
+
+  String getName(String user) {
+    switch (user) {
+      case 'anu':
+        return 'Anu Varshney';
+      case 'sonu':
+        return 'Shuchi Agarwal';
+      case 'teacher':
+        return 'Teacher/Staff';
+      case 'thenik':
+        return 'Developer';
+      default:
+        return 'Manager';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +44,11 @@ class AccountDrawer extends StatelessWidget {
                       children: <Widget>[
                         new CircleAvatar(
                             backgroundImage:
-                                new AssetImage('images/Schuchi.png'),
+                                new AssetImage('images/' + _user + '.png'),
                             radius: 50.0),
                         new Padding(
                             padding: new EdgeInsets.symmetric(vertical: 1.5)),
-                        new Text('Schuchi Agrawal',
+                        new Text(getName(_user),
                             style: new TextStyle(color: Colors.white)),
                       ],
                     )
@@ -44,8 +61,8 @@ class AccountDrawer extends StatelessWidget {
                     Navigator.push(
                         context,
                         new MaterialPageRoute(
-                            builder: (context) =>
-                                new CalendarView(_permissions)));
+                            builder: (context) => new CalendarView(
+                                _permissions, _user, _schools)));
                   },
                 )
               : null,
@@ -57,8 +74,7 @@ class AccountDrawer extends StatelessWidget {
                     Navigator.push(
                         context,
                         new MaterialPageRoute(
-                            builder: (context) =>
-                                new ExpansionPanelsDemo()));
+                            builder: (context) => new ExpansionPanelsDemo()));
                   },
                 )
               : null,
@@ -76,7 +92,11 @@ class AccountDrawer extends StatelessWidget {
             leading: const Icon(Icons.exit_to_app),
             title: new Text('Logout'),
             onTap: () {
-              FirebaseAuth.instance.signOut();
+              try {
+                FirebaseAuth.instance.signOut();
+              } catch (err) {
+                print(err);
+              }
               Navigator.push(context,
                   new MaterialPageRoute(builder: (context) => new LoginPage()));
             },

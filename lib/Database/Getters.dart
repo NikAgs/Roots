@@ -46,3 +46,11 @@ Future<List<KidCard>> getKidCards(DateTime dt) async {
         doc.data['checkinStatus']);
   }).toList();
 }
+
+Future<List<String>> getSchoolNames() async {
+  return (await Firestore.instance.collection('schools').getDocuments())
+      .documents
+      .map((DocumentSnapshot snap) {
+    return snap.documentID;
+  }).toList();
+}
