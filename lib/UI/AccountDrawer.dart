@@ -92,11 +92,7 @@ class AccountDrawer extends StatelessWidget {
             leading: const Icon(Icons.exit_to_app),
             title: new Text('Logout'),
             onTap: () {
-              try {
-                FirebaseAuth.instance.signOut();
-              } catch (err) {
-                print(err);
-              }
+              FirebaseAuth.instance.signOut();
               Navigator.push(context,
                   new MaterialPageRoute(builder: (context) => new LoginPage()));
             },

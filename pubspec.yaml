@@ -38,8 +38,12 @@ flutter:
   #  - images/a_dot_ham.jpeg
 
   assets:
-    - images/Schuchi.png
+    - images/sonu.png
     - images/rfk-logo.png
+    - images/anu.png
+    - images/teacher.png
+    - images/manager.png
+    - images/thenik.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
 
