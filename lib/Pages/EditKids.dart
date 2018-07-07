@@ -1,13 +1,11 @@
-// Copyright 2016 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:flutter/material.dart';
 import '../Database/Getters.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../Database/KidInfo.dart';
+
 typedef Widget DemoItemBodyBuilder<T>(DemoItem<T> item);
-typedef String ValueToString<T>(T value);
+enum DialogDemoAction { yes, no }
 
 class DualHeaderWithHint extends StatelessWidget {
   const DualHeaderWithHint({this.name, this.value, this.hint, this.showHint});
@@ -45,7 +43,7 @@ class DualHeaderWithHint extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: new Text(
               name,
-              style: textTheme.body1.copyWith(fontSize: 15.0),
+              style: textTheme.caption.copyWith(fontSize: 15.0),
             ),
           ),
         ),
@@ -56,9 +54,9 @@ class DualHeaderWithHint extends StatelessWidget {
               margin: const EdgeInsets.only(left: 24.0),
               child: _crossFade(
                   new Text(value,
-                      style: textTheme.caption.copyWith(fontSize: 15.0)),
+                      style: textTheme.body1.copyWith(fontSize: 15.0)),
                   new Text(hint,
-                      style: textTheme.caption.copyWith(fontSize: 15.0)),
+                      style: textTheme.body1.copyWith(fontSize: 15.0)),
                   showHint)))
     ]);
   }
@@ -66,12 +64,17 @@ class DualHeaderWithHint extends StatelessWidget {
 
 class CollapsibleBody extends StatelessWidget {
   const CollapsibleBody(
-      {this.margin: EdgeInsets.zero, this.child, this.onSave, this.onCancel});
+      {this.margin: EdgeInsets.zero,
+      this.child,
+      this.onSave,
+      this.onCancel,
+      this.onDelete});
 
   final EdgeInsets margin;
   final Widget child;
   final VoidCallback onSave;
   final VoidCallback onCancel;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -90,47 +93,60 @@ class CollapsibleBody extends StatelessWidget {
       new Container(
           padding: const EdgeInsets.symmetric(vertical: 16.0),
           child: new Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 new Container(
-                    margin: const EdgeInsets.only(right: 8.0),
+                    margin: const EdgeInsets.only(left: 8.0),
                     child: new FlatButton(
-                        onPressed: onCancel,
-                        child: const Text('CANCEL',
+                        onPressed: onDelete,
+                        child: const Text('DELETE',
                             style: const TextStyle(
-                                color: Colors.black54,
+                                color: Colors.redAccent,
                                 fontSize: 15.0,
                                 fontWeight: FontWeight.w500)))),
-                new Container(
-                    margin: const EdgeInsets.only(right: 8.0),
-                    child: new FlatButton(
-                        onPressed: onSave,
-                        textTheme: ButtonTextTheme.accent,
-                        child: const Text('SAVE')))
+                new Row(
+                  children: <Widget>[
+                    new Container(
+                        margin: const EdgeInsets.only(right: 8.0),
+                        child: new FlatButton(
+                            onPressed: onCancel,
+                            child: const Text('CANCEL',
+                                style: const TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.w500)))),
+                    new Container(
+                        margin: const EdgeInsets.only(right: 8.0),
+                        child: new FlatButton(
+                            onPressed: onSave,
+                            textTheme: ButtonTextTheme.accent,
+                            child: const Text('SAVE')))
+                  ],
+                ),
               ]))
     ]);
   }
 }
 
 class DemoItem<T> {
-  DemoItem({this.name, this.value, this.hint, this.builder, this.valueToString})
-      : textController = new TextEditingController(text: valueToString(value));
+  DemoItem({this.name, this.values, this.hint, this.builder})
+      : nameController = new TextEditingController(text: values[0]),
+        schoolController = new TextEditingController(text: values[1]),
+        gradeController = new TextEditingController(text: values[2]);
 
   final String name;
   final String hint;
-  final TextEditingController textController;
   final DemoItemBodyBuilder<T> builder;
-  final ValueToString<T> valueToString;
-  T value;
+  final TextEditingController nameController;
+  final TextEditingController schoolController;
+  final TextEditingController gradeController;
+  List<String> values;
   bool isExpanded = false;
 
   ExpansionPanelHeaderBuilder get headerBuilder {
     return (BuildContext context, bool isExpanded) {
       return new DualHeaderWithHint(
-          name: name,
-          value: valueToString(value),
-          hint: hint,
-          showHint: isExpanded);
+          name: name, value: values[0], hint: hint, showHint: isExpanded);
     };
   }
 
@@ -138,8 +154,6 @@ class DemoItem<T> {
 }
 
 class ExpansionPanelsDemo extends StatefulWidget {
-  static const String routeName = '/material/expansion_panels';
-
   @override
   _ExpansionPanelsDemoState createState() => new _ExpansionPanelsDemoState();
 }
@@ -151,15 +165,26 @@ class _ExpansionPanelsDemoState extends State<ExpansionPanelsDemo> {
   void initState() {
     super.initState();
 
+    void showDemoDialog<T>({BuildContext context, Widget child}) {
+      showDialog<T>(
+        context: context,
+        builder: (BuildContext context) => child,
+      ).then<void>((T value) {
+        // The value passed to Navigator.pop() or null.
+        if (value != null) {
+          print(value);
+        }
+      });
+    }
+
     getKids().then((List<DocumentSnapshot> kids) {
       kids.sort((a, b) => a.data['name'].compareTo(b.data['name']));
       setState(() {
         _demoItems = kids.map((DocumentSnapshot doc) {
           return new DemoItem<String>(
-            name: 'Name',
-            value: doc.data['name'],
-            hint: 'Change trip name',
-            valueToString: (String value) => value,
+            name: doc.documentID,
+            values: [doc.data['name'], doc.data['school'], doc.data['grade']],
+            hint: 'Edit Info',
             builder: (DemoItem<String> item) {
               void close() {
                 setState(() {
@@ -174,25 +199,72 @@ class _ExpansionPanelsDemoState extends State<ExpansionPanelsDemo> {
                       margin: const EdgeInsets.symmetric(horizontal: 16.0),
                       onSave: () {
                         Form.of(context).save();
+                        updateKidInfo(item.name, item.values);
                         close();
                       },
                       onCancel: () {
                         Form.of(context).reset();
                         close();
                       },
+                      onDelete: () {
+                        showDemoDialog<DialogDemoAction>(
+                            context: context,
+                            child: new AlertDialog(
+                                content: new Text(
+                                    'Are you sure you want to delete ${item.values[0]}?'), // name
+                                actions: <Widget>[
+                                  new FlatButton(
+                                      child: const Text('NO'),
+                                      onPressed: () {
+                                        Navigator.pop(
+                                            context, DialogDemoAction.no);
+                                      }),
+                                  new FlatButton(
+                                      child: const Text('YES'),
+                                      onPressed: () {
+                                        Navigator.pop(
+                                            context, DialogDemoAction.yes);
+                                        Navigator.pop(context);
+                                        deleteKid(item.name);
+                                      })
+                                ]));
+                      },
                       child: new Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: new TextFormField(
-                          controller: item.textController,
-                          decoration: new InputDecoration(
-                            hintText: item.hint,
-                            labelText: item.name,
-                          ),
-                          onSaved: (String value) {
-                            item.value = value;
-                          },
-                        ),
-                      ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: new Column(
+                            children: <Widget>[
+                              new TextFormField(
+                                controller: item.nameController,
+                                decoration: new InputDecoration(
+                                  hintText: item.hint,
+                                  labelText: 'Name',
+                                ),
+                                onSaved: (String value) {
+                                  item.values[0] = value;
+                                },
+                              ),
+                              new TextFormField(
+                                controller: item.schoolController,
+                                decoration: new InputDecoration(
+                                  hintText: item.hint,
+                                  labelText: 'School',
+                                ),
+                                onSaved: (String value) {
+                                  item.values[1] = value;
+                                },
+                              ),
+                              new TextFormField(
+                                controller: item.gradeController,
+                                decoration: new InputDecoration(
+                                  hintText: item.hint,
+                                  labelText: 'Grade',
+                                ),
+                                onSaved: (String value) {
+                                  item.values[2] = value;
+                                },
+                              ),
+                            ],
+                          )),
                     );
                   },
                 ),
@@ -208,9 +280,14 @@ class _ExpansionPanelsDemoState extends State<ExpansionPanelsDemo> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: const Text('Edit Kids Information'),
-        centerTitle: true,
-      ),
+          title: const Text('Edit Kids Information'),
+          centerTitle: true,
+          actions: <Widget>[
+            new IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () => print('wanna add a kid?'),
+                tooltip: 'Add Kid'),
+          ]),
       body: new SingleChildScrollView(
         child: new SafeArea(
           top: false,

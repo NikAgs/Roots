@@ -62,6 +62,7 @@ class _CalendarViewState extends State<CalendarView> {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text('Calendar'),
+        centerTitle: true,
       ),
       body: new Container(
         margin: new EdgeInsets.symmetric(
