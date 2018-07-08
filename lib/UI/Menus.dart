@@ -32,7 +32,7 @@ PopupMenuButton<CheckinDayItem> checkinDayPopup(
 }
 
 PopupMenuButton<KidItem> kidItem(
-    bool noPickup, bool dropoff, dynamic callback) {
+    bool noPickup, bool dropoff, dynamic callback, dynamic sendEmail) {
   return new PopupMenuButton<KidItem>(
       icon: new Icon(Icons.more_vert, color: Colors.black45, size: 24.0),
       onSelected: (KidItem value) {
@@ -42,8 +42,7 @@ PopupMenuButton<KidItem> kidItem(
             value == KidItem.markNoDropoff) {
           callback('dropoff', !dropoff);
         } else {
-          // TODO: this
-          print('you clicked view profile');
+          sendEmail();
         }
       },
       itemBuilder: (BuildContext context) => <PopupMenuItem<KidItem>>[

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mailer/mailer.dart';
 
 import 'dart:async';
 
 import 'Menus.dart';
+import '../email.dart';
+import '../Database/Getters.dart';
 
 class KidCard extends StatefulWidget {
   final String _id;
@@ -122,6 +125,53 @@ class _KidCardState extends State<KidCard> {
     ref.setData({exception: value}, SetOptions.merge);
   }
 
+  void _sendEmail() async {
+    bool send = true;
+
+    Scaffold.of(context).showSnackBar(new SnackBar(
+          content: new Text('Sending Email(s):       ' + _name),
+          duration: new Duration(seconds: 5),
+          action: new SnackBarAction(
+              label: 'CANCEL',
+              onPressed: () {
+                Scaffold.of(context).showSnackBar(
+                    new SnackBar(content: new Text('No Email(s) sent')));
+                send = false;
+              }),
+        ));
+
+    await (new Future.delayed(const Duration(seconds: 5))); //recommend
+
+    if (send) {
+      Map<String, dynamic> credentials = emailInfo[0].data;
+      Map<String, dynamic> message = emailInfo[1].data;
+
+      var options = new GmailSmtpOptions();
+      options.username = credentials["username"];
+      options.password = credentials["password"];
+
+      var emailTransport = new SmtpTransport(options);
+
+      // Create our mail/envelope.
+      var envelope = new Envelope();
+      envelope.from = credentials["address"];
+      getParentEmails(_id).then((emails) {
+        emails.forEach((email) {
+          envelope.recipients.add(email);
+        });
+      });
+
+      envelope.subject = message["subject"].replaceAll("___", _name);
+      envelope.text = message["text"].replaceAll("___", _name);
+
+      // Email it.
+      emailTransport
+          .send(envelope)
+          .then((envelope) => print('Email sent!'))
+          .catchError((e) => print('Error occurred: $e'));
+    }
+  }
+
   Widget _buildLine(bool visible) {
     return new Container(
       width: 30.0,
@@ -193,7 +243,8 @@ class _KidCardState extends State<KidCard> {
                                     style: new TextStyle(
                                         fontSize: 20.0,
                                         color: Colors.black54))),
-                            kidItem(_noPickup, _dropoff, _updateException)
+                            kidItem(_noPickup, _dropoff, _updateException,
+                                _sendEmail)
                           ])),
                   _buildIconRow()
                 ])));

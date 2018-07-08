@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'CheckinPage.dart';
 import '../Database/Getters.dart';
 
+import '../email.dart';
+
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => new _LoginPageState();
@@ -57,6 +59,7 @@ class _LoginPageState extends State<LoginPage> {
 
               Map permissions = await getPermissions();
               List<String> schools = await getSchoolNames();
+              emailInfo = await getEmailInfo();
 
               Navigator.push(
                   context,

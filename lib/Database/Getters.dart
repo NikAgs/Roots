@@ -54,3 +54,13 @@ Future<List<String>> getSchoolNames() async {
     return snap.documentID;
   }).toList();
 }
+
+Future<List<DocumentSnapshot>> getEmailInfo() async {
+  return (await Firestore.instance.collection('email').getDocuments())
+      .documents;
+}
+
+Future<List<dynamic>> getParentEmails(String uid) async {
+  return (await Firestore.instance.collection('kids').document(uid).get())
+      .data["emails"];
+}
