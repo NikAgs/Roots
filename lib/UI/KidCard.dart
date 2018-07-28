@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mailer/mailer.dart';
+import 'package:intl/intl.dart';
 
 import 'dart:async';
 
 import 'Menus.dart';
-import '../email.dart';
+import '../global.dart';
 import '../Database/Getters.dart';
 
 class KidCard extends StatefulWidget {
   final String _id;
-  final String _date;
+  final DateTime _dt;
   final String _name;
   final String _school;
   final String _grade;
@@ -21,7 +22,7 @@ class KidCard extends StatefulWidget {
   String get grade => this._grade;
   String get name => this._name;
 
-  KidCard(this._id, this._date, this._name, this._school, this._grade,
+  KidCard(this._id, this._dt, this._name, this._school, this._grade,
       this._checkinStatus)
       : super(key: new Key(_id));
 
@@ -31,12 +32,12 @@ class KidCard extends StatefulWidget {
 
   @override
   _KidCardState createState() =>
-      new _KidCardState(_id, _date, _name, _school, _grade, _checkinStatus);
+      new _KidCardState(_id, _dt, _name, _school, _grade, _checkinStatus);
 }
 
 class _KidCardState extends State<KidCard> {
   final String _id;
-  final String _date;
+  final DateTime _dt;
   final String _name;
   final String _school;
   final String _grade;
@@ -45,11 +46,15 @@ class _KidCardState extends State<KidCard> {
 
   bool _noPickup = false, _dropoff = false; // default values
 
+  String _date;
+
   StreamSubscription<QuerySnapshot> _exceptionListener;
   StreamSubscription<DocumentSnapshot> _checkinListener;
 
-  _KidCardState(this._id, this._date, this._name, this._school, this._grade,
-      this._checkinStatus);
+  _KidCardState(this._id, this._dt, this._name, this._school, this._grade,
+      this._checkinStatus) {
+    _date = new DateFormat.yMMMMd('en_US').format(_dt);
+  }
 
   @override
   void initState() {
@@ -99,10 +104,32 @@ class _KidCardState extends State<KidCard> {
   }
 
   void _updateCheckinStatus(bool value, int checkinIndex) {
+    String mapIndexes(int index) {
+      switch (index) {
+        case 0:
+          return "school";
+        case 1:
+          return "Vans";
+        default:
+          return "Center";
+      }
+    }
+
+    String mapState(bool state) {
+      return state ? "checked in" : "checked out";
+    }
+
     List copy = _checkinStatus;
     // if (_noPickup || _dropoff) return;
     // if (checkinIndex == 1 && copy[0] == false) return;
     // if (checkinIndex == 2 && (copy[1] == false || copy[0] == false)) return;
+
+    if (new DateFormat.yMMMMd('en_US').format(DateTime.now()) != _date &&
+        DateTime.now().isAfter(_dt) &&
+        (userInfo['profileType'] != 'anu' &&
+            userInfo['profileType' != 'sonu'])) {
+      return;
+    }
 
     copy[checkinIndex] = value;
     Firestore.instance
@@ -111,6 +138,19 @@ class _KidCardState extends State<KidCard> {
         .collection('checkins')
         .document(_id)
         .updateData({'checkinStatus': copy});
+
+    Firestore.instance
+        .collection('calendar')
+        .document(_date)
+        .collection('checkins')
+        .document(_id)
+        .collection('history')
+        .document(new DateFormat.jms().format(DateTime.now()))
+        .setData({
+      "location": mapIndexes(checkinIndex),
+      "user": userInfo['profileName'],
+      "state": mapState(value)
+    });
   }
 
   void _updateException(String exception, bool value) {
@@ -140,7 +180,7 @@ class _KidCardState extends State<KidCard> {
               }),
         ));
 
-    await (new Future.delayed(const Duration(seconds: 5))); //recommend
+    await (new Future.delayed(const Duration(seconds: 5)));
 
     if (send) {
       Map<String, dynamic> credentials = emailInfo[0].data;

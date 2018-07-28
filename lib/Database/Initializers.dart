@@ -26,6 +26,7 @@ Future<void> initializeToday(DateTime dt) async {
       }
     });
   }
+
 }
 
 Future<void> initializeCheckinStatus(

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../global.dart';
+
 class CategoriesBar extends StatelessWidget {
   final List<String> _categories;
   final _onUpdateCategory;
-  final List<String> _schools;
 
-  CategoriesBar(this._categories, this._onUpdateCategory, this._schools);
+  CategoriesBar(this._categories, this._onUpdateCategory);
 
   @override
   Widget build(BuildContext context) {
+    print(_categories[0]);
     return new Wrap(
       alignment: WrapAlignment.center,
       children: <Widget>[
@@ -21,7 +23,7 @@ class CategoriesBar extends StatelessWidget {
           onChanged: (String newValue) {
             _onUpdateCategory(newValue, 0);
           },
-          items: _schools.map((String school) {
+          items: schools.map((String school) {
             return new DropdownMenuItem<String>(
                 value: school,
                 child: new Container(
@@ -35,11 +37,11 @@ class CategoriesBar extends StatelessWidget {
           children: <Widget>[
             new Padding(padding: new EdgeInsets.only(left: 20.0)),
             new Category(
-                'all', _categories[1], () => _onUpdateCategory('all', 1)),
+                'All', _categories[1], () => _onUpdateCategory('All', 1)),
             new Category(
-                'kinder', _categories[1], () => _onUpdateCategory('kinder', 1)),
-            new Category('elementary', _categories[1],
-                () => _onUpdateCategory('elementary', 1)),
+                'Kinder', _categories[1], () => _onUpdateCategory('Kinder', 1)),
+            new Category('Elementary', _categories[1],
+                () => _onUpdateCategory('Elementary', 1)),
             new Padding(padding: new EdgeInsets.only(right: 15.0)),
           ],
         )

@@ -20,7 +20,7 @@ Future<DocumentSnapshot> getKidDay(String id, String date) async {
       .get();
 }
 
-Future<Map> getPermissions() async {
+Future<Map> getUserInfo() async {
   FirebaseUser user = await FirebaseAuth.instance.currentUser();
   return (await Firestore.instance
           .collection('authenticatedUsers')
@@ -39,7 +39,7 @@ Future<List<KidCard>> getKidCards(DateTime dt) async {
       .map((DocumentSnapshot doc) {
     return new KidCard(
         doc.documentID,
-        new DateFormat.yMMMMd('en_US').format(dt),
+        dt,
         doc.data['name'],
         doc.data['school'],
         doc.data['grade'],

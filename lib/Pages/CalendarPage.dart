@@ -9,15 +9,14 @@ import '../Database/Exceptions.dart';
 
 import 'dart:async';
 
-class CalendarView extends StatefulWidget {
-  final Map _permissions;
-  final String _user;
-  final List<String> _schools;
+import '../global.dart';
 
-  CalendarView(this._permissions, this._user, this._schools);
+class CalendarView extends StatefulWidget {
+
+  CalendarView();
 
   @override
-  _CalendarViewState createState() => new _CalendarViewState(_permissions, _user, _schools);
+  _CalendarViewState createState() => new _CalendarViewState();
 }
 
 class _CalendarViewState extends State<CalendarView> {
@@ -31,11 +30,7 @@ class _CalendarViewState extends State<CalendarView> {
   StreamSubscription<QuerySnapshot> _listener;
   Map<String, String> _kidMap = {}; // loading default
 
-  Map _permissions;
-  String _user;
-  List<String> _schools;
-
-  _CalendarViewState(this._permissions, this._user, this._schools);
+  _CalendarViewState();
 
   @override
   void initState() {
@@ -83,7 +78,7 @@ class _CalendarViewState extends State<CalendarView> {
                     context,
                     new MaterialPageRoute(
                         builder: (context) =>
-                            new CheckinPage(dt, _permissions, _user, _schools)),
+                            new CheckinPage(dt)),
                     (Route r) => !Navigator.canPop(context));
               },
             ),

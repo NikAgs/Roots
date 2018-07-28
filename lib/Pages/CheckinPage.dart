@@ -12,41 +12,36 @@ import '../UI/KidCard.dart';
 import '../UI/AccountDrawer.dart';
 import '../UI/Menus.dart';
 
+import '../global.dart';
+
 class CheckinPage extends StatefulWidget {
   final DateTime _dt;
-  final Map _permissions;
-  final String _user;
-  final List<String> _schools;
 
-  CheckinPage(this._dt, this._permissions, this._user, this._schools);
+  CheckinPage(this._dt);
 
   @override
-  _CheckinPageState createState() => new _CheckinPageState(_dt, _permissions, _user, _schools);
+  _CheckinPageState createState() => new _CheckinPageState(_dt);
 }
 
 class _CheckinPageState extends State<CheckinPage> {
   final DateTime _dt;
 
-  Map _permissions; // {calendarAccess -> T/F, canEditKids -> T/F, canEditToday -> T/F}
-  String _user;
-  List<String> _schools;
-
   bool _canEditToday;
   bool _pickups = true;
   List<String> _categories = [
-    'all',
-    'all'
+    'All',
+    'All'
   ]; // [0] -> school, [1] -> Kinder/Elementary
   StreamSubscription<QuerySnapshot> _exceptionListener;
   List<KidCard> _kids = [];
   List<KidCard> _filteredKids = [];
 
-  _CheckinPageState(this._dt, this._permissions, this._user, this._schools) {
+  _CheckinPageState(this._dt) {
     if (new DateFormat.yMMMMd('en_US').format(DateTime.now()) ==
         new DateFormat.yMMMMd('en_US').format(_dt)) {
-      _canEditToday = _permissions['canEditToday'];
+      _canEditToday = userInfo['canEditToday'];
     } else {
-      _canEditToday = _permissions['calendarAccess'];
+      _canEditToday = userInfo['calendarAccess'];
     }
   }
 
@@ -91,7 +86,7 @@ class _CheckinPageState extends State<CheckinPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        drawer: new AccountDrawer(_permissions, _user, _schools),
+        drawer: new AccountDrawer(),
         appBar: new AppBar(
             backgroundColor: _pickups ? null : Colors.red,
             centerTitle: true,
@@ -115,7 +110,7 @@ class _CheckinPageState extends State<CheckinPage> {
                     ? <Widget>[
                         new Padding(padding: new EdgeInsets.only(bottom: 10.0)),
                         _canEditToday
-                            ? new CategoriesBar(_categories, _updateCategory, _schools)
+                            ? new CategoriesBar(_categories, _updateCategory)
                             : null,
                         new Padding(padding: new EdgeInsets.only(bottom: 25.0)),
                         new Wrap(
@@ -142,8 +137,8 @@ class _CheckinPageState extends State<CheckinPage> {
 
   List<KidCard> filterKids(List<KidCard> kids) {
     List<KidCard> filtered = kids.where((KidCard kc) {
-      if (_categories[0] == 'all' || kc.school == _categories[0]) {
-        if (_categories[1] == 'all' || groupGrade(kc.grade) == _categories[1]) {
+      if (_categories[0] == 'All' || kc.school == _categories[0]) {
+        if (_categories[1] == 'All' || groupGrade(kc.grade) == _categories[1]) {
           return true;
         }
       }
@@ -156,20 +151,18 @@ class _CheckinPageState extends State<CheckinPage> {
   }
 
   String groupGrade(String grade) {
-    if (grade == '') return 'elementary';
+    if (grade == '') return 'Elementary';
     try {
       int.parse(grade);
-      return 'elementary';
+      return 'Elementary';
     } catch (FormatException) {
-      return 'kinder';
+      return 'Kinder';
     }
   }
 
   Future<Null> _callRefreshCallback() async {
-    Navigator.pushReplacement(
-        context,
-        new MaterialPageRoute(
-            builder: (context) => new CheckinPage(_dt, _permissions, _user, _schools)));
+    Navigator.pushReplacement(context,
+        new MaterialPageRoute(builder: (context) => new CheckinPage(_dt)));
   }
 
   void _callPickupsCallback(bool pickups) {

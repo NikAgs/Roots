@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'CheckinPage.dart';
 import '../Database/Getters.dart';
 
-import '../email.dart';
+import '../global.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -44,12 +44,10 @@ class _LoginPageState extends State<LoginPage> {
 
     Widget loginButton = new Padding(
       padding: EdgeInsets.symmetric(vertical: 16.0),
-      child: new Material(
-        borderRadius: BorderRadius.circular(30.0),
-        shadowColor: Colors.lightBlueAccent.shade100,
-        elevation: 5.0,
-        child: new MaterialButton(
-          minWidth: 200.0,
+      child: new MaterialButton(
+      
+          elevation: 5.0,
+          minWidth: 125.0,
           height: 42.0,
           onPressed: () async {
             try {
@@ -57,15 +55,14 @@ class _LoginPageState extends State<LoginPage> {
                   email: (_username.text + '@rootsforkids.org'),
                   password: _password.text);
 
-              Map permissions = await getPermissions();
-              List<String> schools = await getSchoolNames();
+              userInfo = await getUserInfo();
+              schools = await getSchoolNames();
               emailInfo = await getEmailInfo();
 
               Navigator.push(
                   context,
                   new MaterialPageRoute(
-                      builder: (context) => new CheckinPage(DateTime.now(),
-                          permissions, _username.text, schools)));
+                      builder: (context) => new CheckinPage(DateTime.now())));
             } catch (e) {
               setState(() => _invalidUserPass = true);
               _password.text = '';
@@ -76,7 +73,6 @@ class _LoginPageState extends State<LoginPage> {
           child:
               const Text('Log In', style: const TextStyle(color: Colors.white)),
         ),
-      ),
     );
 
     /*
@@ -97,9 +93,9 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.symmetric(horizontal: 100.0),
           children: <Widget>[
             logo,
-            new SizedBox(height: 25.0),
+            new SizedBox(height: 50.0),
             email,
-            new SizedBox(height: 10.0),
+            new SizedBox(height: 15.0),
             password,
             new SizedBox(height: 30.0),
             loginButton,

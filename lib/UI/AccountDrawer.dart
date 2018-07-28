@@ -5,27 +5,11 @@ import '../Pages/CalendarPage.dart';
 import '../Pages/LoginPage.dart';
 import '../Pages/EditKids.dart';
 
+import '../global.dart';
+
 class AccountDrawer extends StatelessWidget {
-  final Map _permissions;
-  final String _user;
-  final List<String> _schools;
-
-  AccountDrawer(this._permissions, this._user, this._schools);
-
-  String getName(String user) {
-    switch (user) {
-      case 'anu':
-        return 'Anu Varshney';
-      case 'sonu':
-        return 'Shuchi Agarwal';
-      case 'teacher':
-        return 'Teacher/Staff';
-      case 'thenik':
-        return 'Developer';
-      default:
-        return 'Manager';
-    }
-  }
+ 
+  AccountDrawer();
 
   @override
   Widget build(BuildContext context) {
@@ -44,16 +28,16 @@ class AccountDrawer extends StatelessWidget {
                       children: <Widget>[
                         new CircleAvatar(
                             backgroundImage:
-                                new AssetImage('images/' + _user + '.png'),
+                                new AssetImage('images/' + userInfo['profileType']+ '.png'),
                             radius: 50.0),
                         new Padding(
                             padding: new EdgeInsets.symmetric(vertical: 1.5)),
-                        new Text(getName(_user),
+                        new Text(userInfo['profileName'],
                             style: new TextStyle(color: Colors.white)),
                       ],
                     )
                   ])),
-          _permissions['calendarAccess']
+          userInfo['calendarAccess']
               ? new ListTile(
                   leading: const Icon(Icons.date_range),
                   title: new Text('Calendar'),
@@ -61,12 +45,11 @@ class AccountDrawer extends StatelessWidget {
                     Navigator.push(
                         context,
                         new MaterialPageRoute(
-                            builder: (context) => new CalendarView(
-                                _permissions, _user, _schools)));
+                            builder: (context) => new CalendarView()));
                   },
                 )
               : null,
-          _permissions['canEditKids']
+          userInfo['canEditKids']
               ? new ListTile(
                   leading: const Icon(Icons.mode_edit),
                   title: new Text('Edit Child Info'),
